@@ -1,12 +1,12 @@
 # db
-host = 'host'
-user = 'user'
+host = 'localhost'
+user = 'host'
 password = 'password'
-database = 'schedule_bot'
+database = 'shedle'
 charset = 'utf8mb4'
 
 # bot
-TOKEN = 'TOKEN'
+TOKEN = '6867349821:AAFXVI0KBQsBfwB17iES4_p2Xw-KAzmrmtM'
 
 # urls
 rasp_group_list = "https://edu.donstu.ru/api/raspGrouplist"

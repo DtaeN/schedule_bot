@@ -36,7 +36,7 @@ async def _auto_sending(_day, day):
 # формат:  МИНУТЫ  ЧАСЫ  ДЕНЬ(В_МЕСЯЦЕ)  МЕСЯЦ  ДЕНЬ_НЕДЕЛИ
 @crontab("0 20 * * *")
 async def schedule_auto_sending():
-    match datetime.now().weekday():
+    match datetime.datetime.now().weekday():
         case 0:
             await _auto_sending("Tuesday", "Вторник")
         case 1:
@@ -469,7 +469,7 @@ async def main():
 
 if __name__ == "__main__":
     connection = db_init()
-    create_table(connection)
+    # create_table(connection)
 
     loop = asyncio.get_event_loop()
     loop.create_task(main())
