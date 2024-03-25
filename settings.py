@@ -6,7 +6,7 @@ database = 'shedle'
 charset = 'utf8mb4'
 
 # bot
-TOKEN = '6867349821:AAFXVI0KBQsBfwB17iES4_p2Xw-KAzmrmtM'
+TOKEN = 'TOKEN'
 
 # urls
 rasp_group_list = "https://edu.donstu.ru/api/raspGrouplist"
