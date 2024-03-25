@@ -1,6 +1,6 @@
 # db
-host = 'localhost'
-user = 'host'
+host = 'host'
+user = 'user'
 password = 'password'
 database = 'shedle'
 charset = 'utf8mb4'

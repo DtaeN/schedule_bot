@@ -26,7 +26,7 @@ listener_teacher_name = {}
 
 async def _auto_sending(_day, day):
     type_week = 1 if datetime.date.today().isocalendar()[1] % 2 == 0 else 2
-    for _user in all_users(connection):
+    for _user in all_users():
         if _user['auto_sending'] == 0 or None:
             pass
         elif _user['auto_sending'] == 1:
@@ -72,6 +72,7 @@ async def message_start(message: types.Message):
 async def teacher(callback: types.CallbackQuery):
     listener_teacher_name[callback.from_user.id] = True
     await callback.message.edit_text("Введите фамилию преподавателя:")
+    await callback.answer()
 
 
 @dp.message(F.text)
@@ -108,10 +109,10 @@ async def listener(message: types.Message):
 
 @dp.callback_query(F.data.startswith("teacher_"))
 async def callbacks_teacher(callback: types.CallbackQuery):
-    if user_one(connection, callback.from_user.id) is None:
-        create_user(connection, callback.from_user.id, int(callback.data.split('_')[1]), 2)
+    if user_one(callback.from_user.id) is None:
+        create_user(callback.from_user.id, int(callback.data.split('_')[1]), 2)
     else:
-        edit_schedule_id(connection, callback.from_user.id, int(callback.data.split('_')[1]), 2)
+        edit_schedule_id(callback.from_user.id, int(callback.data.split('_')[1]), 2)
 
     buttons1 = [
         [
@@ -135,7 +136,6 @@ async def callbacks_teacher(callback: types.CallbackQuery):
         f"Вы можете изменить расписание в настройках,"
         f"также в настройках вы можете настроить авто рассылку.",
         reply_markup=keyboard1)
-    await callback.answer()
 
     buttons2 = [
         [
@@ -147,8 +147,8 @@ async def callbacks_teacher(callback: types.CallbackQuery):
     keyboard2 = types.InlineKeyboardMarkup(inline_keyboard=buttons2)
 
     await callback.message.answer(
-        "Хотите включить автоматическую рассылку расписания?", reply_markup=keyboard2
-    )
+        "Хотите включить автоматическую рассылку расписания?", reply_markup=keyboard2)
+    await callback.answer()
 
 
 @dp.callback_query(F.data == "student")
@@ -168,6 +168,7 @@ async def student(callback: types.CallbackQuery):
     await callback.message.answer(
         f"Выберите свой курс",
         reply_markup=keyboard)
+    await callback.answer()
 
 
 @dp.callback_query(F.data.startswith("course_"))
@@ -190,10 +191,10 @@ async def callbacks_course(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data.startswith("group_"))
 async def callbacks_groups(callback: types.CallbackQuery):
-    if user_one(connection, callback.from_user.id) is None:
-        create_user(connection, callback.from_user.id, int(callback.data.split('_')[1]), 1)
+    if user_one(callback.from_user.id) is None:
+        create_user(callback.from_user.id, int(callback.data.split('_')[1]), 1)
     else:
-        edit_schedule_id(connection, callback.from_user.id, int(callback.data.split('_')[1]), 1)
+        edit_schedule_id(callback.from_user.id, int(callback.data.split('_')[1]), 1)
 
     buttons1 = [
         [
@@ -216,7 +217,6 @@ async def callbacks_groups(callback: types.CallbackQuery):
     await callback.message.edit_text(f"Вы можете изменить расписание в настройках, "
                                      f"также в настройках вы можете настроить авто рассылку.",
                                      reply_markup=keyboard1)
-    await callback.answer()
 
     buttons2 = [
         [
@@ -228,29 +228,27 @@ async def callbacks_groups(callback: types.CallbackQuery):
     keyboard2 = types.InlineKeyboardMarkup(inline_keyboard=buttons2)
 
     await callback.message.answer(
-        "Хотите включить автоматическую рассылку расписания?", reply_markup=keyboard2
-    )
+        "Хотите включить автоматическую рассылку расписания?", reply_markup=keyboard2)
+    await callback.answer()
 
 
 @dp.callback_query(F.data.startswith("auto_sending_"))
 async def callbacks_auto_sending(callback: types.CallbackQuery):
     if callback.data.split("_")[2] == "on":
-        auto_sending(connection, callback.from_user.id, True)
+        auto_sending(callback.from_user.id, True)
         await callback.message.edit_text("Рассылка успешно включена")
-        await callback.answer()
-
     elif callback.data.split("_")[2] == "off":
-        auto_sending(connection, callback.from_user.id, False)
+        auto_sending(callback.from_user.id, False)
         await callback.message.edit_text("Рассылка успешно выключена")
-        await callback.answer()
+    await callback.answer()
 
 
 @dp.callback_query(F.data == "call_settings")
 async def call_settings(callback: types.CallbackQuery):
-    _user = user_one(connection, callback.from_user.id)
+    _user = user_one(callback.from_user.id)
     if _user is None:
-        await callback.message.answer("Сначала пожалуйста выберите группу, "
-                                      "для этого используйте комманду /start")
+        await callback.message.answer("Сначала, пожалуйста, выберите группу, "
+                                      "для этого используйте команду /start")
     else:
         buttons = [
             [
@@ -262,7 +260,7 @@ async def call_settings(callback: types.CallbackQuery):
         keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
 
         await callback.message.answer("⚙️ Настройки:", reply_markup=keyboard)
-        await callback.answer()
+    await callback.answer()
 
 
 @dp.callback_query(F.data.startswith("switch_"))
@@ -278,11 +276,10 @@ async def callbacks_auto_sending(callback: types.CallbackQuery):
 
         keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
 
-        _user = user_one(connection, callback.from_user.id)
+        _user = user_one(callback.from_user.id)
         await callback.message.edit_text(f"В данный момент авто рассылка "
                                          f"{'включена' if _user['auto_sending'] == 1 else 'выключена'}",
                                          reply_markup=keyboard)
-        await callback.answer()
 
     elif callback.data.split('_')[1] == 'schedule':
         buttons = [
@@ -297,21 +294,23 @@ async def callbacks_auto_sending(callback: types.CallbackQuery):
             f"Чьё расписание вы хотите посмотреть?",
             reply_markup=keyboard,
         )
+    await callback.answer()
 
 
 @dp.callback_query(F.data.startswith("sw_"))
 async def callbacks_sw(callback: types.CallbackQuery):
     if callback.data.split('_')[1] == 'auto-sending':
         if callback.data.split('_')[2] == 'on':
-            auto_sending(connection, callback.from_user.id, True)
+            auto_sending(callback.from_user.id, True)
             await callback.message.edit_text("Авто рассылка успешно включина")
         elif callback.data.split('_')[2] == 'off':
-            auto_sending(connection, callback.from_user.id, False)
+            auto_sending(callback.from_user.id, False)
             await callback.message.edit_text("Авто рассылка успешно выключина")
     elif callback.data.split('_')[1] == 'group':
-        edit_schedule_id(connection, callback.from_user.id, int(callback.data.split('_')[2]), 1)
+        edit_schedule_id(callback.from_user.id, int(callback.data.split('_')[2]), 1)
         await callback.message.edit_text(f"Группа успешна изменина на "
                                          f"{disp.find_group(int(callback.data.split('_')[2])).name}")
+    await callback.answer()
 
 
 @dp.callback_query(F.data.startswith("call_"))
@@ -395,12 +394,14 @@ def all_commands_button(type_week):
 async def call_button_menu(callback: types.CallbackQuery):
     type_week = 1 if datetime.date.today().isocalendar()[1] % 2 == 0 else 2
     await callback.message.edit_text(text=callback.message.text, reply_markup=all_commands_button(type_week))
+    await callback.answer()
 
 
 @dp.callback_query(F.data == "menu_button")
 async def call_menu_button(callback: types.CallbackQuery):
     type_week = 1 if datetime.date.today().isocalendar()[1] % 2 == 0 else 2
     await callback.message.edit_text(text=callback.message.text, reply_markup=menu_button(type_week))
+    await callback.answer()
 
 
 def switch_schedule(day, user_id, type_week):
@@ -425,12 +426,12 @@ async def menu_button_week(callback: types.CallbackQuery):
         await callback.message.edit_text(
             text=switch_schedule(callback.message.text.split(' ')[1], callback.from_user.id, 1),
             reply_markup=menu_button(1))
-        await callback.answer()
     elif callback.data.split("_")[3] == "down":
         await callback.message.edit_text(
             text=switch_schedule(callback.message.text.split(' ')[1], callback.from_user.id, 2),
             reply_markup=menu_button(2))
-        await callback.answer()
+    
+    await callback.answer()
 
 
 @dp.callback_query(F.data.startswith("all_commands_button_week_"))
@@ -439,20 +440,20 @@ async def all_commands_button_week(callback: types.CallbackQuery):
         await callback.message.edit_text(
             text=switch_schedule(callback.message.text.split(' ')[1], callback.from_user.id, 1),
             reply_markup=all_commands_button(1))
-        await callback.answer()
     elif callback.data.split("_")[4] == "down":
         await callback.message.edit_text(
             text=switch_schedule(callback.message.text.split(' ')[1], callback.from_user.id, 2),
             reply_markup=all_commands_button(2))
-        await callback.answer()
+        
+    await callback.answer()
 
 
 def _schedule(user_id, _weekday, weekday, type_week):
-    _user = user_one(connection, user_id)
+    _user = user_one(user_id)
     if _user is None:
         return (
-            "Сначала пожалуйста выберите группу, "
-            "для этого используйте комманду /start"
+            "Сначала, пожалуйста, выберите группу, "
+            "для этого используйте команду /start"
         )
     else:
         if _user["user_type"] == 1:
@@ -468,8 +469,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    connection = db_init()
-    # create_table(connection)
+    #create_table()
 
     loop = asyncio.get_event_loop()
     loop.create_task(main())
