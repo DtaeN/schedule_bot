@@ -8,6 +8,9 @@ charset = 'utf8mb4'
 # bot
 TOKEN = 'TOKEN'
 
+# logs
+directory = "dirLogs"
+
 # urls
 rasp_group_list = "https://edu.donstu.ru/api/raspGrouplist"
 schedule_group = "https://edu.donstu.ru/api/Rasp"
